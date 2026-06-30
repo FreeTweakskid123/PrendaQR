@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRrewear | Catálogo de Moda Sostenible</title>
+    <style>
+        /* Estilos Globales de tu interfaz original */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5; /* Gris claro estilo Facebook */
+            color: #050505;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #ffffff;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2b7a78;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #17252a;
+        }
+
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #2b7a78;
+            font-weight: 600;
+        }
+
+        /* Vistas (Control de visualización) */
+        .page-view {
+            display: none; /* Oculto por defecto */
+        }
+
+        .page-view.active {
+            display: block; /* Muestra el catálogo al tener la clase active */
+        }
+
+        /* --- INTERFAZ DEL CATÁLOGO --- */
+        .catalog-selector-section {
+            max-width: 1200px;
+            margin: 30px auto 10px auto;
+            padding: 0 20px;
+        }
+
+        .catalog-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #050505;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .product-card-thumb {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+
+        .product-card-thumb:hover {
+            transform: translateY(-2px);
+        }
+
+        .product-card-thumb.active {
+            border-color: #1877f2;
+        }
+
+        .thumb-img {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            background-color: #fafafa;
+        }
+
+        .thumb-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #050505;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .thumb-price {
+            font-size: 13px;
+            color: #65676b;
+            font-weight: 700;
+        }
+
+        /* Panel Principal Marketplace */
+        .marketplace-container {
+            max-width: 1200px;
+            margin: 10px auto 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 20px;
+        }
+
+        .product-gallery {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+
+        .product-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 550px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .product-panel {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+        }
+
+        .product-title {
+            font-size: 24px;
+            color: #050505;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .price {
+            font-size: 22px;
+            color: #1877f2;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #ced0d4;
+            margin: 15px 0;
+        }
+
+        .section-subtitle {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #050505;
+        }
+
+        .specs-list {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .specs-list li {
+            font-size: 15px;
+            margin-bottom: 10px;
+            color: #050505;
+            display: flex;
+        }
+
+        .specs-list strong {
+            width: 120px;
+            color: #65676b;
+            font-weight: 500;
+        }
+
+        .description {
+            color: #050505;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn-buy {
+            background-color: #1877f2;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-buy:hover {
+            background-color: #166fe5;
+        }
+
+        /* --- BURBUJA FLOTANTE DEL CHATBOT --- */
+        .chat-widget-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        /* Botón circular de Messenger */
+        .chat-burbuja-btn {
+            width: 60px;
+            height: 60px;
+            background-color: #1877f2;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .chat-burbuja-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .chat-burbuja-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        /* Ventana del Chat (Oculta por defecto) */
+        .chat-container {
+            width: 360px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none; /* Se controla con JS */
+            flex-direction: column;
+            height: 450px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        /* Ajustes de diseño adaptados para ventana Messenger */
+        .chat-header {
+            background-color: #ffffff;
+            padding: 12px 15px;
+            border-bottom: 1px solid #ced0d4;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-close-chat {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #65676b;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .bot-avatar {
+            width: 36px;
+            height: 36px;
+            background-color: #2b7a78;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .bot-status-info h2 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #050505;
+        }
+
+        .bot-status-info p {
+            font-size: 11px;
+            color: #65676b;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 8px 12px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message.bot {
+            background-color: #e4e6eb;
+            color: #050505;
+            align-self: flex-start;
+            border-top-left-radius: 4px;
+        }
+
+        .message.user {
+            background-color: #1877f2;
+            color: white;
+            align-self: flex-end;
+            border-top-right-radius: 4px;
+        }
+
+        .chat-input-area {
+            padding: 10px 15px;
+            border-top: 1px solid #ced0d4;
+            background-color: #ffffff;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            background-color: #f0f2f5;
+            border: 1px solid transparent;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+            color: #050505;
+        }
+
+        .chat-input:focus {
+            background-color: #ffffff;
+            border-color: #1877f2;
+        }
+
+        .btn-send {
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Responsivo */
+        @media (max-width: 850px) {
+            .marketplace-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin: 10px auto;
+            }
+            .product-gallery {
+                min-height: auto;
+            }
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+        }
+
+        @media (max-width: 450px) {
+            .chat-container {
+                width: calc(100vw - 40px);
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">QR<span>rewear</span></div>
+        <nav>
+            <a>Catálogo</a>
+        </nav>
+    </header>
+
+    <main>
+        <div id="vista-catalogo" class="page-view active">
+            
+            <section class="catalog-selector-section">
+                <h2 class="catalog-title">Explora nuestras prendas disponibles</h2>
+                <div class="products-grid">
+                    
+                    <div class="product-card-thumb active" data-id="1" onclick="cambiarPrenda(1)">
+                        <img src="img1.jpeg" alt="Blusa Negra" class="thumb-img">
+                        <div class="thumb-title">Blusa Negra Manga Larga</div>
+                        <div id="thumb-price-1" class="thumb-price">S/. 25.00</div>
+                    </div>
+
+                    <div class="product-card-thumb" data-id="2" onclick="cambiarPrenda(2)">
+                        <img src="img2.jpeg" alt="Camiseta Azul" class="thumb-img">
+                        <div class="thumb-title">Camiseta Azul Cuello Alto</div>
+                        <div id="thumb-price-2" class="thumb-price">S/. 25.00</div>
+                    </div>
+
+                </div>
+            </section>
+
+            <div class="marketplace-container">
+                <section class="product-gallery">
+                    <img id="main-product-image" src="img1.jpeg" alt="Prenda Seleccionada" class="product-image">
+                </section>
+
+                <section class="product-panel">
+                    <h1 id="product-title" class="product-title">Blusa Negra de Manga Larga - Cuello Cuadrado</h1>
+                    <div id="product-price" class="price">S/. 25.00</div>
+                    
+                    <div class="divider"></div>
+
+                    <h2 class="section-subtitle">Detalles</h2>
+                    <ul class="specs-list">
+                        <li><strong>Uso:</strong> <span id="spec-uso">Menos de 10</span></li>
+                        <li><strong>Talla:</strong> <span id="spec-talla">S</span></li>
+                        <li><strong>Color:</strong> <span id="spec-color">Negro</span></li>
+                        <li><strong>Estado:</strong> <span id="spec-estado">Excelente estado</span></li>
+                    </ul>
+
+                    <div class="divider"></div>
+
+                    <h2 class="section-subtitle">Descripción del vendedor</h2>
+                    <p id="product-description" class="description">
+                        Prenda exclusiva diseñada bajo altos estándares de comodidad y durabilidad. Ajuste cómodo, textil suave y estilizado ideal para cualquier ocasión casual.
+                    </p>
+
+                    <button class="btn-buy" onclick="enviarMensaje()">Enviar mensaje al vendedor</button>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- WIDGET INTEGRADO DE CHATBOT (ESTILO MESSENGER FLOTANTE) -->
+    <div class="chat-widget-container">
+        
+        <!-- Caja de Chat principal -->
+        <div class="chat-container" id="chatContainer">
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <div class="bot-avatar">R</div>
+                    <div class="bot-status-info">
+                        <h2>Asistente QRrewear</h2>
+                        <p>En línea • Soporte Automático</p>
+                    </div>
+                </div>
+                <button class="btn-close-chat" onclick="toggleChat()">✕</button>
+            </div>
+
+            <!-- Cuerpo con los mensajes -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    ¡Hola! Bienvenido a QRrewear. 🌿 ¿En qué te puedo ayudar hoy? Puedes preguntarme sobre nuestras prendas, los códigos QR o los envíos.
+                </div>
+            </div>
+
+            <!-- Input inferior -->
+            <div class="chat-input-area">
+                <input type="text" id="userInput" class="chat-input" placeholder="Escribe un mensaje aquí..." onkeypress="evaluarEnter(event)">
+                <button class="btn-send" onclick="enviarMensajeChat()">Enviar</button>
+            </div>
+        </div>
+
+        <!-- Burbuja Flotante Clickable -->
+        <div class="chat-burbuja-btn" onclick="toggleChat()">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.914 1.448 5.518 3.717 7.205V22l3.359-1.844c.89.246 1.834.383 2.811.383 5.523 0 10-4.146 10-9.258C22 6.145 17.523 2 12 2zm1.03 12.96-2.122-2.262-4.137 2.262 4.548-4.828 2.166 2.262 4.093-2.262-4.548 4.828z"/>
+            </svg>
+        </div>
+
+    </div>
+
+    <script>
+        // Datos de tus prendas utilizando img1.jpeg e img2.jpeg
+        const prendas = {
+            1: {
+                titulo: "Blusa Negra de Manga Larga - Cuello Cuadrado",
+                precioBase: "S/. 25.00",
+                imagen: "img1.jpeg",
+                uso: 3, 
+                talla: "S", color: "Negro", estado: "Excelente estado",
+                descripcion: "Prenda exclusiva diseñada bajo altos estándares de comodidad y durabilidad. Ajuste cómodo, textil suave y estilizado ideal para cualquier ocasión casual."
+            },
+            2: {
+                titulo: "Camiseta Azul de Manga Larga - Cuello Alto",
+                precioBase: "S/. 25.00",
+                imagen: "img2.jpeg",
+                uso: 4, 
+                talla: "M", color: "Azul Marino", estado: "Como nueva",
+                descripcion: "Camiseta elegante de cuello alto ajustada al cuerpo, confeccionada con tejido elástico y suave para máxima comodidad."
+            }
+        };
+
+        function obtenerPrecioPorUso(prenda) {
+            if (prenda.uso >= 5 && prenda.uso <= 7) {
+                return "S/. 7.99";
+            }
+            return prenda.precioBase;
+        }
+
+        function inicializarPreciosCatalogo() {
+            for (let id in prendas) {
+                const precioElemento = document.getElementById(`thumb-price-${id}`);
+                if (precioElemento) {
+                    precioElemento.innerText = obtenerPrecioPorUso(prendas[id]);
+                }
+            }
+        }
+
+        function cambiarPrenda(id) {
+            const prenda = prendas[id];
+            if (!prenda) return;
+
+            const precioFinal = obtenerPrecioPorUso(prenda);
+
+            document.getElementById('main-product-image').src = prenda.imagen;
+            document.getElementById('product-title').innerText = prenda.titulo;
+            document.getElementById('product-price').innerText = precioFinal;
+            
+            // Si tiene más de 2 usos, muestra "Menos de 10"
+            const textoUso = prenda.uso > 2 ? "Menos de 10" : prenda.uso;
+            document.getElementById('spec-uso').innerText = textoUso;
+            
+            document.getElementById('spec-talla').innerText = prenda.talla;
+            document.getElementById('spec-color').innerText = prenda.color;
+            document.getElementById('spec-estado').innerText = prenda.estado;
+            document.getElementById('product-description').innerText = prenda.descripcion;
+
+            const tarjetas = document.querySelectorAll('.product-card-thumb');
+            tarjetas.forEach((tarjeta) => {
+                if (parseInt(tarjeta.getAttribute('data-id')) === id) {
+                    tarjeta.classList.add('active');
+                } else {
+                    tarjeta.classList.remove('active');
+                }
+            });
+        }
+
+        function enviarMensaje() {
+            const tituloPrenda = document.getElementById('product-title').innerText;
+            alert('Abriendo chat para consultar por: ' + tituloPrenda);
+        }
+
+        // --- SCRIPT DEL CHATBOT INTERACTIVO (SIN ALTERACIONES INTERNAS) ---
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const chatContainer = document.getElementById('chatContainer');
+
+        // Alternar visualización del chat mediante la burbuja
+        function toggleChat() {
+            if (chatContainer.style.display === "flex") {
+                chatContainer.style.display = "none";
+            } else {
+                chatContainer.style.display = "flex";
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        // Función principal para enviar un mensaje
+        function enviarMensajeChat() {
+            const texto = userInput.value.trim();
+            if (texto === '') return;
+
+            // Renderizar mensaje del usuario en pantalla
+            agregarBurbuja(texto, 'user');
+            userInput.value = '';
+
+            // Simular retraso de escritura y procesar respuesta del bot
+            setTimeout(() => {
+                const respuestaBot = procesarPregunta(texto);
+                agregarBurbuja(respuestaBot, 'bot');
+            }, 600);
+        }
+
+        // Detectar si el usuario presiona Enter en el teclado
+        function evaluarEnter(event) {
+            if (event.key === 'Enter') {
+                enviarMensajeChat();
+            }
+        }
+
+        // Añadir los divs al chat y hacer scroll automático al fondo
+        function agregarBurbuja(texto, remitente) {
+            const div = document.createElement('div');
+            div.classList.add('message', remitente);
+            div.innerText = texto;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Lógica de respuestas automáticas
+        function procesarPregunta(mensaje) {
+            const msgNormalizado = mensaje.trim().toLowerCase();
+
+            // --- EASTER EGGS ---
+            if (msgNormalizado === 'juancho y luhana') {
+                return "MIS PAPIS";
+            }
+            if (msgNormalizado === 'j+l') {
+                return "ellos se aman 67 millones de veces";
+            }
+
+            // --- RESPUESTAS DE SOPORTE ---
+            if (msgNormalizado.includes('hola') || msgNormalizado.includes('buenas')) {
+                return "¡Hola de nuevo! Dime, ¿en qué te puedo asesorar respecto al catálogo?";
+            }
+            if (msgNormalizado.includes('qr') || msgNormalizado.includes('codigo')) {
+                return "Cada prenda tiene un código QR único. Al escanearlo, podrás ver cuántas lavadas tiene, su talla exacta y el historial de uso real.";
+            }
+            if (msgNormalizado.includes('blusa') || msgNormalizado.includes('negra') || msgNormalizado.includes('camiseta') || msgNormalizado.includes('azul')) {
+                return "Actualmente disponemos de la Blusa Negra Manga Larga (Talla S) y la Camiseta Azul Cuello Alto (Talla M). Ambas cuestan S/. 25.00.";
+            }
+            if (msgNormalizado.includes('precio') || msgNormalizado.includes('cuanto cuesta') || msgNormalizado.includes('costo')) {
+                return "Nuestras prendas tienen un precio base de S/. 25.00, pero si registran más de 5 usos, ¡el sistema baja el precio de forma automática!";
+            }
+
+            return "Interesante pregunta. De momento no tengo esa información exacta, pero puedes consultar directamente enviando un mensaje al vendedor desde el botón del producto.";
+        }
+
+        window.onload = inicializarPreciosCatalogo;
+    </script>
+</body>
+</html>
